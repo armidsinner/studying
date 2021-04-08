@@ -64,6 +64,10 @@ class Train
     @speed = speed
   end
 
+  def railways_amount
+    return(amount_of_railways)
+  end
+
   def gain_speed(gain)
     @speed = @speed + gain 
   end
