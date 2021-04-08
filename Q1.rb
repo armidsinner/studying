@@ -85,25 +85,30 @@ class Train
   end
 
   def set_route(own_route) 
-    if own_route.instans_of? Route
+    @own_route = own_route
+    if @own_route.instans_of? Route
       @current_station = Route.start_station
-      @station_index =
+      @station_index = 0
       Station.name(Route.start_station).trains.append(self)
     end
   end
 
   def move_train_next
     if @current_station != @end_station  
-      @current_station = Route.list_of_stations[@station_index + 1]     
+      @current_station = @own_route.list_of_stations[@station_index + 1] 
+      @stations_now = [Route.list_of_stations[@station_index], Route.list_of_stations[@station_index -1], Route.list_of_stations[@station_index + 1]]
+      return(@stations_now)    
     end
+
   end
 
   def move_train_back
     if @current_station != @start_station
-      current_station = Route.list_of_stations[@station_index - 1]
+      @current_station = @own_route.list_of_stations[@station_index - 1]
+      @stations_now = [Route.list_of_stations[@station_index], Route.list_of_stations[@station_index + 1], Route.list_of_stations[@station_index - 1]]
+      return(@stations_now) 
     end 
   end
 end
 end    
-
 
