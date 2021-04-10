@@ -121,7 +121,3 @@ class Train
     end
   end
 end
-
-
-
-
