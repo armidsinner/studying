@@ -1,118 +1,127 @@
-class Station 
-  def initialize(name, trains = [])
-      @name = name
-      @trains = trains
+# class station contains name, list of trains, types of trains
+class Station
+  attr_reader :name, :trains, :freight_list, :passenger_list
+  def initialize(name)
+    @name = name
+    @trains = []
+    @freight_list = []
+    @passenger_list = []
   end
 
   def accept_train(train_new)
-    if train_new.instans_of? Trains
-      @trains.append(train_new)
-    end
+    @trains.append(train_new)
+    train_new.stop
   end
 
   def trains_on_the_station
-    return (@trains)
+    @trains.each { |train| puts train.number }
   end
 
   def freight_trains
-    for train in @trains
-      if train.type == freight
-        @freight_list.append(train)
+    @trains.each do |train|
+      if train.type == 'freight'
+        @freight_list.append(train.number)
       end
     end
-    return (@freight_list)
+    puts @freight_list
   end
 
   def passenger_trains
-    for train in @trains 
-      if train.type == passenger 
-        @passenger_list.append(train)
+    @trains.each do |train|
+      if train.type == 'passenger'
+        @passenger_list.append(train.number)
       end
     end
-    return(@passenger_list)
+    puts @passenger_list
   end
 
   def send_train(train_to_remove)
-    @trains.remove(train_to_remove)
+    @trains.delete(train_to_remove)
+  end
 end
 
+# class route contains stations
 class Route
-  def initialize(start_station, end_station, list_of_stations = [start_station, end_station] )
+  attr_reader :start_station, :end_station, :list_of_stations
+  def initialize(start_station, end_station)
     @start_station = start_station
     @end_station = end_station
+    @list_of_stations = [start_station, end_station]
   end
 
-  def add_station() 
+  def add_station(new_station)
     @list_of_stations.insert(@list_of_stations.length - 1, new_station)
-  end 
+  end
 
   def remove_station(needed_station)
-    @list_of_stations.remove(needed_station) 
+    @list_of_stations.delete(needed_station)
   end
 
   def show_route
-    return(@list_of_stations)
+    @list_of_stations.each { |station| puts station.name }
   end
 end
 
+# class train contains number, type, amount of railways and route
 class Train
-  attr_reader :amount_of_railways
-  def initialize(number, type, amount_of_railways, speed = 0)
-    @number = number 
+  attr_reader :amount_of_railways, :number, :type, :speed, :own_route, :current_station
+  def initialize(number, type, amount_of_railways)
+    @number = number
     @type = type
     @amount_of_railways = amount_of_railways
-    @speed = speed
-  end
-
-  def railways_amount
-    return(amount_of_railways)
+    @speed = 0
+    @station_index = 0
+    @current_station = 0
+    @own_route = []
   end
 
   def gain_speed(gain)
-    @speed = @speed + gain 
+    @speed += gain
   end
 
-  def stop 
+  def stop
     @speed = 0
   end
 
-  def add_railway 
-    if @speed == 0 
-      @amount_of_railways += 1
-    end
+  def add_railway
+    @amount_of_railways += 1 if @speed.zero?
   end
 
-  def remove_railway 
-    if @speed == 0 and @amount_of_railways > 0
-      @amount_of_railways -= 1
-    end
+  def remove_railway
+    @amount_of_railways -= 1 if @speed.zero? && @amount_of_railways > 0
   end
 
-  def set_route(own_route) 
+  def new_route(own_route)
     @own_route = own_route
-    if @own_route.instans_of? Route
-      @current_station = Route.start_station
-      @station_index = 0
-      Station.name(Route.start_station).trains.append(self)
-    end
+    @current_station = own_route.start_station
+    @station_index = 0
+    own_route.start_station.accept_train(self)
   end
 
   def move_train_next
-    if @current_station != @end_station  
-      @current_station = @own_route.list_of_stations[@station_index + 1] 
-      @stations_now = [Route.list_of_stations[@station_index], Route.list_of_stations[@station_index -1], Route.list_of_stations[@station_index + 1]]
-      return(@stations_now)    
+    unless @current_station == @end_station
+      @station_index += 1 
+      @current_station = @own_route.list_of_stations[@station_index]
+      @stations_now = [own_route.list_of_stations[@station_index - 1],
+                       own_route.list_of_stations[@station_index],
+                       own_route.list_of_stations[@station_index + 1]]
+      @stations_now.each { |station| puts station.name }
+      current_station.accept_train(self)
     end
-
   end
 
   def move_train_back
     if @current_station != @start_station
       @current_station = @own_route.list_of_stations[@station_index - 1]
-      @stations_now = [Route.list_of_stations[@station_index], Route.list_of_stations[@station_index + 1], Route.list_of_stations[@station_index - 1]]
-      return(@stations_now) 
-    end 
+      @stations_now = [own_route.list_of_stations[@station_index],
+                       own_route.list_of_stations[@station_index + 1],
+                       own_route.list_of_stations[@station_index - 1]]
+      @stations_now.each { |station| puts station.name }
+      current_station.accept_train(self)
+    end
   end
 end
-end    
+
+
+
 
