@@ -6,6 +6,10 @@ require_relative 'cargo_train'
 require_relative 'cargo_vagon'
 require_relative 'passenger_vagon'
 
+new_stations = []
+new_trains = []
+new_routes = []
+
 while a != '0'
   puts 'Выберите действие, введя цифру:
   1) Создать станцию
