@@ -6,6 +6,7 @@ require_relative 'cargo_train'
 require_relative 'cargo_vagon'
 require_relative 'passenger_vagon'
 
+a = nil 
 new_stations = []
 new_trains = []
 new_routes = []
