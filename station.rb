@@ -5,7 +5,8 @@ class Station
     @name = name
     @trains = []
   end
-#Методы используются не только внутри класса, следовательно, они public
+  
+# Методы используются не только внутри класса, следовательно, они public
   def accept_train(train_new)
     @trains.append(train_new)
     train_new.stop
@@ -13,10 +14,6 @@ class Station
 
   def send_train(train_to_remove)
     @trains.delete(train_to_remove)
-  end
-
-  def trains_on_the_station
-    @trains.each { |train| puts train.number }
   end
 
   def freight_trains

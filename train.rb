@@ -19,7 +19,7 @@ class Train
   end
 
   def add_vagon(vagon)
-    @vagons.append(vagon) if @speed.zero? && vagon.vagon_type == @type
+    @vagons.append(vagon) if @speed.zero? && vagon.type == @type
   end
 
   def remove_vagon
