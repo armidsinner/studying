@@ -15,3 +15,4 @@ new_trains = []
 new_routes = []
 new_stations.append(moscow, ivanovo, petushki)
 new_routes.append(route1)
+

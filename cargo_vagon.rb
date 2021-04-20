@@ -1,6 +1,5 @@
-#Type for a vagon
-class CargoVagon
-  attr_accessor :type
+# Type for a vagon
+class CargoVagon < Vagon
   def initialize
     @type = 'freight'
   end

@@ -1,6 +1,5 @@
 # type for train
-class PassengerVagon
-  attr_accessor :type
+class PassengerVagon < Vagon
   def initialize
     @type = 'passenger'
   end

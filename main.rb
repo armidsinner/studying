@@ -2,15 +2,18 @@ require_relative 'station'
 require_relative 'train'
 require_relative 'route'
 require_relative 'passenger_train'
+require_relative 'vagon'
 require_relative 'cargo_train'
 require_relative 'cargo_vagon'
 require_relative 'passenger_vagon'
 
+
+
 class Interface
   def initialize
-    @new_stations = []
-    @new_trains = []
-    @new_routes = []
+    @stations = []
+    @trains = []
+    @routes = []
   end
 
   def start_using
@@ -31,37 +34,69 @@ class Interface
       a = gets.chomp
       case a
       when '1'
-        puts 'Введите название станции'
-        name = gets.chomp
-        name = Station.new(name)
-        @new_stations.append(name)
+        create_station
       when '2'
-        puts 'Создать грузовой или пассажирский поезд?
-        Чтобы создать грузовой, нажмите 1.
-        Чтобы создать пассажирский, нажмите 2'
-        a = gets.chomp
-        case a
-        when '1'
-          puts 'Введите номер поезда'
-          number = gets.chomp
-          number = CargoTrain.new(number)
-          @new_trains.append(number)
-        when '2'
-          number = gets.chomp
-          number = PassengerTrain.new(number)
-          @new_trains.append(number)
-        end
+        create_train
       when '3'
-        puts 'Введите название маршрута, начальную и кoнечную станцию'
-        route_name = gets.chomp
-        start_station = gets.chomp
-        end_station = gets.chomp
-        route_name = Route.new(start_station, end_station)
-        @new_routes.append(route_name)
+        create_route
       when '4'
-        puts 'Список маршрутов:'
+        add_station_to_the_route
+      when '5'
+        delete_station_from_the_route
+      when '6'
+        set_route
+      when '7'
+        add_remove_vagon
+      when '8'
+        show_stations
+      when '9'
+       trains_on_the_station
+      when '10'
+        move_train
+      end
+    end
+  end
+
+  private
+
+  def create_station
+    puts 'Введите название станции'
+    name = gets.chomp
+    name = Station.new(name)
+    @stations.append(name)
+  end
+
+  def create_train
+    puts 'Создать грузовой или пассажирский поезд?
+    Чтобы создать грузовой, нажмите 1.
+    Чтобы создать пассажирский, нажмите 2'
+    a = gets.chomp
+    case a
+    when '1'
+      puts 'Введите номер поезда'
+      number = gets.chomp
+      number = CargoTrain.new(number)
+      @trains.append(number)
+    when '2'
+      number = gets.chomp
+      number = PassengerTrain.new(number)
+      @trains.append(number)
+    end
+  end
+
+  def create_route
+    puts 'Введите название маршрута, начальную и кoнечную станцию'
+    route_name = gets.chomp
+    start_station = gets.chomp
+    end_station = gets.chomp
+    route_name = Route.new(start_station, end_station)
+    @routes.append(route_name)
+  end
+
+  def add_station_to_the_route
+    puts 'Список маршрутов:'
         counter = 0
-        @new_routes.each do |route|
+        @routes.each do |route|
           print counter.to_s + ')' + route.list_of_stations[0].name + '-' + route.list_of_stations[-1].name
           counter += 1
           puts
@@ -70,7 +105,7 @@ class Interface
         needed_route = gets.chomp
         puts 'Список станций:'
         counter = 0
-        @new_stations.each do |station|
+        @stations.each do |station|
           unless new_routes[needed_route.to_i].list_of_stations.include? station
             print counter.to_s + ')' + station.name
             counter += 1
@@ -79,110 +114,116 @@ class Interface
         end
         puts 'Какую станцию хотите добавить?'
         needed_station = gets.chomp
-        @new_routes[needed_route.to_i].add_station(@new_stations[needed_station.to_i])
-      when '5'
-        puts 'Список маршрутов:'
-        counter = 0
-        @new_routes.each do |route|
-          print counter.to_s + ')' + route.list_of_stations[0].name + '-' + route.list_of_stations[-1].name
-          counter += 1
-          puts
-        end
-        puts 'Из какого маршрута хотите удалить станцию?'
-        needed_route = gets.chomp
-        puts 'Список станций в данном маршруте:'
-        counter = 0
-        @new_stations[needed_route.to_i].list_of_stations.each do |station|
-          print counter.to_s + ')' + station.name
-          counter += 1
-          puts
-        end
-        puts 'Какую станцию хотите удалить?'
-        needed_station = gets.chomp
-        @new_routes[needed_route.to_i].remove_station(@new_stations[needed_station.to_i])
-      when '6'
-        puts 'Список всех поездов:'
-        counter = 0
-        new_trains.each do |train|
-          print counter.to_s + ')' + train.number
-          counter += 1
-          puts
-        end
-        puts 'Для какого поезда хотите задать маршрут'
-        needed_train = gets.chomp
-        puts 'Список маршрутов:'
-        counter = 0
-        @new_routes.each do |route|
-          print counter.to_s + ')' + route.list_of_stations[0].name + '-' + route.list_of_stations[-1].name
-          counter += 1
-          puts
-        end
-        puts 'Какой из существующих маршрутов присвоить?'
-        needed_route = gets.chomp
-        @new_trains[needed_train.to_i].new_route(@new_routes[needed_route.to_i])
-      when '7'
-        puts 'Список всех поездов:'
-        counter = 0
-        @new_trains.each do |train|
-          print counter.to_s + ')' + train.number
-          counter += 1
-          puts
-        end
-        puts 'Какому поезду хотите добавить вагон?'
-        needed_train = gets.chomp
-        puts 'Чтобы добавить вагон к поезду, нажмите 1
-        Чтобы отцепить вагон от поезда, нажмите 2'
-        a = gets.chomp
-        case a
-        when '1'
-          if @new_trains[needed_train.to_i].type == 'freight'
-            new_vagon = CargoVagon.new
-            @new_trains[needed_train.to_i].add_vagon(new_vagon)
-          end
-          if new_trains[needed_train.to_i].type == 'passenger'
-            new_vagon = PassengerVagon.new
-            @new_trains[needed_train.to_i].add_vagon(new_vagon)
-          end
-        when '2'
-          @new_trains[needed_train.to_i].remove_vagon
-        end
-      when '8'
-        @new_stations.each { |station| puts station.name }
-      when '9'
-        puts 'Список станций:'
-        counter = 0
-        @new_stations.each do |station|
-          print counter.to_s + ')' + station.name
-          counter += 1
-          puts
-        end
-        puts 'Для какой станции отобразить список поездов?'
-        needed_station = gets.chomp
-        @new_stations[needed_station.to_i].trains.each { |train| puts train.number}
-      when '10'
-        puts 'Список всех поездов:'
-        counter = 0
-        @new_trains.each do |train|
-          print counter.to_s + ')' + train.number
-          counter += 1
-          puts
-        end
-        puts 'Какой поезд хотите переместить по маршруту'
-        needed_train = gets.chomp
-        puts 'Чтобы переместить поезд вперед по маршруту, нажмите 1
-        Чтобы переместить поезд назад по маршруту, нажмите 2'
-        a = gets.chomp
-        case a
-          when '1'
-            @new_trains[needed_train.to_i].move_train_next
-          when '2'
-            @new_trains[needed_train.to_i].move_train_back
-        end
+        @routes[needed_route.to_i].add_station(@stations[needed_station.to_i])
+  end
+
+  def delete_station_from_the_route
+    puts 'Список маршрутов:'
+    counter = 0
+    @routes.each do |route|
+      print counter.to_s + ')' + route.list_of_stations[0].name + '-' + route.list_of_stations[-1].name
+      counter += 1
+      puts
+    end
+    puts 'Из какого маршрута хотите удалить станцию?'
+    needed_route = gets.chomp
+    puts 'Список станций в данном маршруте:'
+    counter = 0
+    @stations[needed_route.to_i].list_of_stations.each do |station|
+      print counter.to_s + ')' + station.name
+      counter += 1
+      puts
+    end
+    puts 'Какую станцию хотите удалить?'
+    needed_station = gets.chomp
+    @routes[needed_route.to_i].remove_station(@stations[needed_station.to_i])
+  end
+
+  def set_route
+    puts 'Список всех поездов:'
+    counter = 0
+    @new_trains.each do |train|
+      print counter.to_s + ')' + train.number
+      counter += 1
+      puts
+    end
+    puts 'Для какого поезда хотите задать маршрут'
+    needed_train = gets.chomp
+    puts 'Список маршрутов:'
+    counter = 0
+    @routes.each do |route|
+      print counter.to_s + ')' + route.list_of_stations[0].name + '-' + route.list_of_stations[-1].name
+      counter += 1
+      puts
+    end
+    puts 'Какой из существующих маршрутов присвоить?'
+    needed_route = gets.chomp
+    @trains[needed_train.to_i].new_route(@routes[needed_route.to_i])
+  end
+
+  def add_remove_vagon
+    puts 'Список всех поездов:'
+    counter = 0
+    @trains.each do |train|
+      print counter.to_s + ')' + train.number
+      counter += 1
+      puts
+    end
+    puts 'Какому поезду хотите добавить вагон?'
+    needed_train = gets.chomp
+    puts 'Чтобы добавить вагон к поезду, нажмите 1
+    Чтобы отцепить вагон от поезда, нажмите 2'
+    a = gets.chomp
+    case a
+    when '1'
+      if @trains[needed_train.to_i].type == 'freight'
+        new_vagon = CargoVagon.new
+        @trains[needed_train.to_i].add_vagon(new_vagon)
       end
+      if @trains[needed_train.to_i].type == 'passenger'
+        new_vagon = PassengerVagon.new
+        @trains[needed_train.to_i].add_vagon(new_vagon)
+      end
+    when '2'
+      @trains[needed_train.to_i].remove_vagon
+    end
+  end
+  
+  def show_stations
+    @stations.each { |station| puts station.name }
+  end
+
+  def trains_on_the_station 
+    puts 'Список станций:'
+    counter = 0
+    @stations.each do |station|
+      print counter.to_s + ')' + station.name
+      counter += 1
+      puts
+    end
+    puts 'Для какой станции отобразить список поездов?'
+    needed_station = gets.chomp
+    @stations[needed_station.to_i].trains.each { |train| puts train.number}
+  end  
+
+  def move_train 
+    puts 'Список всех поездов:'
+    counter = 0
+    @trains.each do |train|
+      print counter.to_s + ')' + train.number
+      counter += 1
+      puts
+    end
+    puts 'Какой поезд хотите переместить по маршруту'
+    needed_train = gets.chomp
+    puts 'Чтобы переместить поезд вперед по маршруту, нажмите 1
+    Чтобы переместить поезд назад по маршруту, нажмите 2'
+    a = gets.chomp
+    case a
+      when '1'
+        @trains[needed_train.to_i].move_train_next
+      when '2'
+        @trains[needed_train.to_i].move_train_back
     end
   end
 end
-
-a = Interface.new
-a.start_using
-

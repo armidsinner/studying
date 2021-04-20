@@ -5,7 +5,6 @@ class Station
     @name = name
     @trains = []
   end
-  
 # Методы используются не только внутри класса, следовательно, они public
   def accept_train(train_new)
     @trains.append(train_new)

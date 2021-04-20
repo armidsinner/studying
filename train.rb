@@ -5,7 +5,7 @@ class Train
     @number = number
     @speed = 0
     @vagons = []
-    @type = 0
+    @type = type
   end
 
   # Методы используются не только внутри класса, следовательно, они public
