@@ -32,6 +32,10 @@ class Train
     @speed += gain
   end
 
+  def counter
+    @counter 
+  end
+
   def stop
     @speed = 0
   end
@@ -62,9 +66,6 @@ class Train
     @station_index -= 1
   end
 
-  def find
-    
-  end
   private
 
   # Данные методы по текущему ТЗ не требуются к вызову из пользовательского кода, и не вызываются в дочерних классах
@@ -85,4 +86,3 @@ class Train
     end
   end
 end
-
