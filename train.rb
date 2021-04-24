@@ -6,15 +6,14 @@ class Train
   include SetBrand
 
   attr_reader :number, :speed, :own_route, :vagons, :type
-
   @@instances = []
 
-  def Train.all
+  def self.all
     @@instances
   end
 
-  def Train.find(number)
-      @@instances.find { |train| train.number == number.to_s }
+  def self.find(number)
+    @@instances.find { |train| train.number == number.to_s }
   end
 
   def initialize(number)
@@ -30,10 +29,6 @@ class Train
 
   def gain_speed(gain)
     @speed += gain
-  end
-
-  def counter
-    @counter 
   end
 
   def stop

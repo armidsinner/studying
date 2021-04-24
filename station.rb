@@ -6,7 +6,7 @@ class Station
 
   @@instances = []
 
-  def Station.all
+  def self.all
     @@instances
   end
 

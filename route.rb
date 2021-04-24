@@ -6,7 +6,7 @@ class Route
 
   @@instances = []
 
-  def Route.all
+  def self.all
     @@instances
   end
 

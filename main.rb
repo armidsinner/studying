@@ -94,26 +94,26 @@ class Interface
 
   def add_station_to_the_route
     puts 'Список маршрутов:'
-        counter = 0
-        @routes.each do |route|
-          print counter.to_s + ')' + route.list_of_stations[0].name + '-' + route.list_of_stations[-1].name
-          counter += 1
-          puts
-        end
-        puts 'В какой маршрут хотите добавить станцию?'
-        needed_route = gets.chomp
-        puts 'Список станций:'
-        counter = 0
-        @stations.each do |station|
-          unless new_routes[needed_route.to_i].list_of_stations.include? station
-            print counter.to_s + ')' + station.name
-            counter += 1
-            puts
-          end
-        end
-        puts 'Какую станцию хотите добавить?'
-        needed_station = gets.chomp
-        @routes[needed_route.to_i].add_station(@stations[needed_station.to_i])
+    counter = 0
+    @routes.each do |route|
+      print counter.to_s + ')' + route.list_of_stations[0].name + '-' + route.list_of_stations[-1].name
+      counter += 1
+      puts
+    end
+    puts 'В какой маршрут хотите добавить станцию?'
+    needed_route = gets.chomp
+    puts 'Список станций:'
+    counter = 0
+    @stations.each do |station|
+      unless new_routes[needed_route.to_i].list_of_stations.include? station
+        print counter.to_s + ')' + station.name
+        counter += 1
+        puts
+      end
+    end
+    puts 'Какую станцию хотите добавить?'
+    needed_station = gets.chomp
+    @routes[needed_route.to_i].add_station(@stations[needed_station.to_i])
   end
 
   def delete_station_from_the_route
@@ -226,3 +226,5 @@ class Interface
     end
   end
 end
+i=Interface.new
+i.start_using
