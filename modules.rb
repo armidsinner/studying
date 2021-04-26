@@ -9,19 +9,20 @@ module InstanceCounter
   end
 
   module ClassMethods
-    attr_reader :counter
+    attr_accessor :counter
+
     def instances
-      # Минус один, потому что иначе при вызове метода на классе будет прибавлен еще один элемент
-      @counter = -1 if @counter.nil?
-      @counter += 1
+      if self.counter.nil?
+        self.counter = 0
+      end
+      self.counter
     end
   end
 
   module InstanceMethods
-    # Метод, увеличивающий счетчик количества экземпляров, который можно вызвать только на экземпляре класса, в отличии от от instances
-    # который можно вызвать на классе
     def register_instance
-      self.class.instances
+      self.class.counter ||= 0
+      self.class.counter += 1
     end
   end
 end
