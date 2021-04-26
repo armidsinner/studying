@@ -81,6 +81,3 @@ class Train
     end
   end
 end
-
-
-puts Train.instances
