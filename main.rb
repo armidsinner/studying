@@ -35,7 +35,7 @@ class Interface
       when '1'
         begin 
           create_station
-        rescue Exception => e
+        rescue => e
           puts e
           puts "Введите название станции повторно!"
           retry
@@ -43,7 +43,7 @@ class Interface
       when '2'
         begin
           create_train
-        rescue Exception => e
+        rescue => e
           puts e
           puts "Введите название, начальную и конечную станцию повторно!"
           retry
@@ -51,7 +51,7 @@ class Interface
       when '3'
         begin 
           create_route
-        rescue Exception => e
+        rescue => e
           puts e
           puts "Введите повторно!"
           retry
