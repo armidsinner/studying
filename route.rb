@@ -2,7 +2,7 @@ require_relative 'modules'
 # class route contains stations
 class Route
   include InstanceCounter
-  attr_reader :start_station, :end_station, :list_of_stations, :name
+  attr_reader :start_station, :end_station, :list_of_stations, :route_name
 
   @@instances = []
 
@@ -10,8 +10,8 @@ class Route
     @@instances
   end
 
-  def initialize(name, start_station, end_station)
-    @name = name
+  def initialize(route_name, start_station, end_station)
+    @route_name = route_name
     @list_of_stations = [start_station, end_station]
     @@instances.append(self)
     validate!
@@ -33,6 +33,6 @@ rescue
 end
 
 def validate!
-  raise "Поле названия маршрута не может быть пустым!" if name == ''
+  raise "Поле названия маршрута не может быть пустым!" if route_name == ''
   true
 end

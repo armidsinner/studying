@@ -35,24 +35,24 @@ class Interface
       when '1'
         begin 
           create_station
-        rescue RuntimeError => e
-          puts e.inspect
+        rescue Exception => e
+          puts e
           puts "Введите название станции повторно!"
           retry
         end
       when '2'
         begin
           create_train
-        rescue RuntimeError => e
-          puts e.inspect
+        rescue Exception => e
+          puts e
           puts "Введите название, начальную и конечную станцию повторно!"
           retry
         end
       when '3'
         begin 
           create_route
-        rescue RuntimeError => e
-          puts e.inspect
+        rescue Exception => e
+          puts e
           puts "Введите повторно!"
           retry
         end

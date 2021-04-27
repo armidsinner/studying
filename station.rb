@@ -14,7 +14,7 @@ class Station
     @name = name
     @trains = []
     @@instances.append(self)
-    validate!
+    validate_st!
   end
 
   def accept_train(train_new)
@@ -54,12 +54,12 @@ class Station
 end
 
 def valid?
-  validate!
+  validate_st!
 rescue
   false
 end
 
-def validate!
+def validate_st!
   raise "Поле названия станции не может быть пустым!" if name == ''
   true
 end
