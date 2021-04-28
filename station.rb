@@ -14,8 +14,9 @@ class Station
     @name = name
     @trains = []
     @@instances.append(self)
+    validate_st!
   end
-# Методы используются не только внутри класса, следовательно, они public
+
   def accept_train(train_new)
     @trains.append(train_new)
     train_new.stop
@@ -52,4 +53,13 @@ class Station
   end
 end
 
+def valid?
+  validate_st!
+rescue
+  false
+end
 
+def validate_st!
+  raise "Поле названия станции не может быть пустым!" if name == ''
+  true
+end

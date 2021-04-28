@@ -6,6 +6,8 @@ class Train
   include SetBrand
 
   attr_reader :number, :speed, :own_route, :vagons, :type
+
+  NUMBER_FORMAT = /^([а-яa-z]|\d){3}-?([а-яa-z]|\d){2}$/i
   @@instances = []
 
   def self.all
@@ -16,6 +18,7 @@ class Train
     @@instances.find { |train| train.number == number.to_s }
   end
 
+
   def initialize(number)
     @number = number
     @speed = 0
@@ -23,9 +26,8 @@ class Train
     @type = type
     @@instances.append(self)
     register_instance
+    validate!
   end
-
-  # Методы используются не только внутри класса, следовательно, они public
 
   def gain_speed(gain)
     @speed += gain
@@ -61,9 +63,17 @@ class Train
     @station_index -= 1
   end
 
-  private
+  def valid?
+    validate!
+  rescue
+    false
+  end
 
-  # Данные методы по текущему ТЗ не требуются к вызову из пользовательского кода, и не вызываются в дочерних классах
+  def validate!
+    raise "Поле номера поезда не может быть пустым!" if number == ''
+    raise "Номер недопустимого формата!" if number !~ NUMBER_FORMAT
+    true
+  end
 
   def current_station
     @own_route.list_of_stations[@station_index]

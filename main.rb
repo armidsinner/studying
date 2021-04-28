@@ -33,11 +33,29 @@ class Interface
       a = gets.chomp
       case a
       when '1'
-        create_station
+        begin 
+          create_station
+        rescue => e
+          puts e
+          puts "Введите название станции повторно!"
+          retry
+        end
       when '2'
-        create_train
+        begin
+          create_train
+        rescue => e
+          puts e
+          puts "Введите название, начальную и конечную станцию повторно!"
+          retry
+        end
       when '3'
-        create_route
+        begin 
+          create_route
+        rescue => e
+          puts e
+          puts "Введите повторно!"
+          retry
+        end
       when '4'
         add_station_to_the_route
       when '5'
@@ -75,10 +93,12 @@ class Interface
       puts 'Введите номер поезда'
       number = gets.chomp
       number = CargoTrain.new(number)
+      puts "Создан поезд с номером #{number.number}, это поезд типа #{number.type}"
       @trains.append(number)
     when '2'
       number = gets.chomp
       number = PassengerTrain.new(number)
+      puts "Создан поезд с номером #{number.number}, это поезд типа #{number.type}"
       @trains.append(number)
     end
   end
@@ -88,7 +108,7 @@ class Interface
     route_name = gets.chomp
     start_station = gets.chomp
     end_station = gets.chomp
-    route_name = Route.new(start_station, end_station)
+    route_name = Route.new(route_name, start_station, end_station)
     @routes.append(route_name)
   end
 
@@ -141,7 +161,7 @@ class Interface
   def set_route
     puts 'Список всех поездов:'
     counter = 0
-    @new_trains.each do |train|
+    @trains.each do |train|
       print counter.to_s + ')' + train.number
       counter += 1
       puts
@@ -226,5 +246,3 @@ class Interface
     end
   end
 end
-i=Interface.new
-i.start_using
