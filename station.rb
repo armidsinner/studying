@@ -51,15 +51,19 @@ class Station
   def passenger_trains_count
     passenger_trains.length
   end
-end
 
-def valid?
-  validate_st!
-rescue
-  false
-end
+  def valid?
+    validate_st!
+  rescue
+    false
+  end
 
-def validate_st!
-  raise "Поле названия станции не может быть пустым!" if name == ''
-  true
+  def validate_st!
+    raise "Поле названия станции не может быть пустым!" if name == ''
+    true
+  end
+
+  def show_trains(block)
+    @trains.each { |train| block.call train}
+  end
 end

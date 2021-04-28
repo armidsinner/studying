@@ -7,3 +7,4 @@ class Vagon
     @type = type
   end
 end
+

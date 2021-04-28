@@ -90,4 +90,8 @@ class Train
       @own_route.list_of_stations[@station_index + 1]
     end
   end
+
+  def show_vagons(block)
+    @vagons.each { |vagon| block.call vagon}
+  end
 end
