@@ -29,6 +29,9 @@ class Interface
       8) Показать список станций
       9) Показать список поездов на станции
       10) Переместить поезд по маршруту
+      11) Показать список вагонов у поезда 
+      12) Занять объем в вагоне
+      13) Занять пассажирское место в вагоне
       0) Завершить программу'
       a = gets.chomp
       case a
@@ -45,7 +48,7 @@ class Interface
           create_train
         rescue => e
           puts e
-          puts "Введите название, начальную и конечную станцию повторно!"
+          puts "Введите номер повторно!"
           retry
         end
       when '3'
@@ -70,6 +73,12 @@ class Interface
        trains_on_the_station
       when '10'
         move_train
+      when '11'
+        show_vagons
+      when '12'
+        use_volume
+      when '13'
+        use_sit
       end
     end
   end
@@ -196,11 +205,15 @@ class Interface
     case a
     when '1'
       if @trains[needed_train.to_i].type == 'freight'
-        new_vagon = CargoVagon.new
+        puts 'Какой объем у создаваемого вагона?'
+        volume = gets.chomp.to_i
+        new_vagon = CargoVagon.new(volume)
         @trains[needed_train.to_i].add_vagon(new_vagon)
       end
       if @trains[needed_train.to_i].type == 'passenger'
-        new_vagon = PassengerVagon.new
+        puts 'Сколько мест в создаваемом вагоне?'
+        sits = gets.chomp.to_i
+        new_vagon = PassengerVagon.new(sits)
         @trains[needed_train.to_i].add_vagon(new_vagon)
       end
     when '2'
@@ -221,8 +234,10 @@ class Interface
       puts
     end
     puts 'Для какой станции отобразить список поездов?'
-    needed_station = gets.chomp
-    @stations[needed_station.to_i].trains.each { |train| puts train.number}
+    needed_station = gets.chomp  
+    block = proc { |train| puts 'Номер поезда:' + train.number.to_s + ', ' + 
+    'Тип поезда:' + train.type.to_s + ', ' + 'Количество вагонов:' + train.vagons.length.to_s }
+    @stations[needed_station.to_i].show_trains(block)
   end  
 
   def move_train 
@@ -244,5 +259,91 @@ class Interface
       when '2'
         @trains[needed_train.to_i].move_train_back
     end
+  end
+
+  def show_vagons
+    puts 'Чтобы вывести список грузовых поездов, нажмите 1
+Чтобы вывести список пассажирских поездов, нажмите 2'
+    a = gets.chomp
+    case a 
+    when '1'
+      counter = 0
+      @trains.each do |train|
+        if train.type == 'freight'
+        print counter.to_s + ')' + train.number
+        counter += 1
+        puts
+        end
+      end
+      puts 'Для какого поезда хотите вывести список вагонов?'
+      needed_train = gets.chomp
+      a = 1
+      block1 = proc { |vagon| puts 'Номер вагона:' + a.to_s + ', ' + 
+        'Тип вагона:' + vagon.type.to_s + ', ' + 'Свободный объем:' + vagon.free_volume.to_s + 
+        ', ' + 'Занятый объем:' + vagon.used_volume.to_s; a += 1 }
+      @trains[needed_train.to_i].show_vagons(block1)
+    when '2'  
+      counter = 0
+      @trains.each do |train|
+        if train.type == 'passenger'
+        print counter.to_s + ')' + train.number
+        counter += 1
+        puts
+        end
+      end
+      puts 'Для какого поезда хотите вывести список вагонов?'
+      needed_train = gets.chomp
+      a = 1
+      block2 =  proc { |vagon| puts 'Номер вагона:' + a.to_s + ', ' + 
+        'Тип вагона:' + vagon.type.to_s + ', ' + 'Свободных мест:' + vagon.free_sits.to_s + 
+        ', ' + 'Занятых мест:' + vagon.used_sits.to_s; a += 1 }
+      @trains[needed_train.to_i].show_vagons(block2)
+    end
+  end
+
+  def use_volume
+    puts 'Объем вагона какого поезда хотите занять?'
+    counter = 0
+      @trains.each do |train|
+        if train.type == 'freight'
+        print counter.to_s + ')' + train.number
+        counter += 1
+        puts
+        end
+      end
+    needed_train = gets.chomp
+    puts 'Список вагонов у данного поезда:'
+    a = 1
+    block1 = proc { |vagon| puts 'Номер вагона:' + a.to_s + ', ' + 
+      'Тип вагона:' + vagon.type.to_s + ', ' + 'Свободный объем:' + vagon.free_volume.to_s + 
+      ', ' + 'Занятый объем:' + vagon.used_volume.to_s; a += 1 }
+    @trains[needed_train.to_i].show_vagons(block1)
+    puts 'Введите номер вагона, объем которого хотите использовать'
+    number = gets.chomp.to_i - 1 
+    puts 'Введите объем, который хотите занять'
+    volume = gets.chomp.to_i
+    @trains[needed_train.to_i].vagons[number].use_volume(volume)
+  end
+
+  def use_sit
+    puts 'Объем вагона какого поезда хотите занять?'
+    counter = 0
+      @trains.each do |train|
+        if train.type == 'passenger'
+        print counter.to_s + ')' + train.number
+        counter += 1
+        puts
+        end
+      end
+    needed_train = gets.chomp
+    puts 'Список вагонов у данного поезда:'
+    a = 1
+    block2 =  proc { |vagon| puts 'Номер вагона:' + a.to_s + ', ' + 
+      'Тип вагона:' + vagon.type.to_s + ', ' + 'Свободных мест:' + vagon.free_sits.to_s + 
+      ', ' + 'Занятых мест:' + vagon.used_sits.to_s; a += 1 }
+    @trains[needed_train.to_i].show_vagons(block2)
+    puts 'Введите номер вагона, объем которого хотите использовать'
+    number = gets.chomp.to_i - 1 
+    @trains[needed_train.to_i].vagons[number].take_a_sit
   end
 end
