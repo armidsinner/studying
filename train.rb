@@ -4,10 +4,9 @@ require_relative 'modules'
 class Train
   include InstanceCounter
   include SetBrand
-
-  attr_reader :number, :speed, :own_route, :vagons, :type
-
-  NUMBER_FORMAT = /^([а-яa-z]|\d){3}-?([а-яa-z]|\d){2}$/i
+  include Accessor
+  include Validation
+  attr_reader :number, :own_route, :speed, :vagons, :type
   @@instances = []
 
   def self.all
@@ -20,13 +19,14 @@ class Train
 
 
   def initialize(number)
+    @own_values = {}
     @number = number
     @speed = 0
     @vagons = []
     @type = type
     @@instances.append(self)
     register_instance
-    validate!
+    @own_values = {}
   end
 
   def gain_speed(gain)
@@ -61,18 +61,6 @@ class Train
     previous_station.accept_train(self)
     current_station.send_train(self)
     @station_index -= 1
-  end
-
-  def valid?
-    validate!
-  rescue
-    false
-  end
-
-  def validate!
-    raise "Поле номера поезда не может быть пустым!" if number == ''
-    raise "Номер недопустимого формата!" if number !~ NUMBER_FORMAT
-    true
   end
 
   def current_station
