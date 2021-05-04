@@ -57,9 +57,7 @@ module Accessor
     end
   end
 end
-#По сути, нужно сначала передать переменную, как передавали в прошлых методах(символом), но теперь они должны уже существовать
-#Затем, нужно передать символом тип валидации, где будет условие типа если одно, то выполняется код для этого типа, и последний 
-#Аргумент, который по умолчанию 0, будет передаваться для каких-то проверок. Вот такая вот дичь. Я в шоке 
+
 module Validation
   def self.included(base)
     base.extend ClassMethods
@@ -67,55 +65,74 @@ module Validation
   end 
 
   module ClassMethods
-    def validate(name, valiration_type, specifics = 0)
-      valid_this = valiration_type.to_s
-      if valid_this == 'presence'
-        raise 'Значение атрибута не может быть nil!' if name.nil?
-        raise 'Значение атрибута не может быть пустым!' if name == ''
-      end
-      if valid_this == 'format'
-        form = specifics
-        raise 'Значение атрибута не соответствует формату' if name !~ form
-      end
-      if valid_this == 'type'
-        type = specifics
-        raise 'Тип атрибута не соовтетствует заданному' if name != type 
-      end
+    attr_accessor :params_hash, :params
+    def validate(*params_massive)
+      name = params_massive[0].to_sym
+      v_type = params_massive[1].to_sym
+      specifics = params_massive[2]
+      self.params_hash = {}
+      self.params_hash['name']=name
+      self.params_hash['types']=v_type
+      self.params_hash['specials']=specifics
+      self.params ||= []
+      self.params.append(self.params_hash)
     end
   end
-  #Проблема с вызовом вот этого валидейт :a, :hui
+
   module InstanceMethods
     def validate!
-      self.class.validate
+      self.class.params.each do |param|
+        if param['types'] == :presence
+          if @own_values[param['name']][0].nil?
+            print 'Переменная, не прошедшая валидацию: '
+            puts param['name']
+            raise  'Значение атрибута не может быть nil!'
+          end 
+          if @own_values[param['name']][0] == ''
+            print 'Переменная, не прошедшая валидацию: '
+            puts param['name']
+            raise 'Значение атрибута не может быть пустым!' 
+          end
+        end
+        if param['types'] == :format
+          if @own_values[param['name']][-1] !~ param['specials']
+            print 'Переменная, не прошедшая валидацию: '
+            puts param['name']
+            raise 'Значение атрибута не соответствует формату'
+          end
+        end
+        if param['types'] == :type
+          if @own_values[param['name']][-1].class != param['specials']
+            print 'Переменная, не прошедшая валидацию: '
+            puts param['name']
+            raise 'Тип атрибута не соответствует заданному' 
+          end
+        end
+      end
+    end
+
+    def valid?
+      validate!
+    rescue
+      false
     end
   end
 end
+
 
 class Test
   include Accessor
   include Validation
+  attr_accessor :own_values
   attr_accessor_with_history :a, :b, :c
   validate :a, :presence
+  validate :b, :type, Integer
   strong_attr_accessor :d, Integer
   def initialize
-    #Возможно, потребуется подключать эту переменую в каждый класс динамически
+    #Возможно, потребуется подключать эту переменую в каждый класс динамически можно как в методе validate, но зачем...
     @own_values = {}
   end
-
 end
-
-test = Test.new
-test.a
-test.b
-test.b = 7
-test.c 
-test.b = 99
-test.c = 7
-test.d
-test.validate!
-
-
-
 
 
 

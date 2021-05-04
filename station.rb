@@ -2,8 +2,9 @@ require_relative 'modules'
 # class station contains name, list of trains, types of trains
 class Station
   include InstanceCounter
+  include Accessor
+  include Validation
   attr_reader :name, :trains
-
   @@instances = []
 
   def self.all
