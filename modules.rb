@@ -66,14 +66,9 @@ module Validation
 
   module ClassMethods
     attr_accessor :params_hash, :params
-    def validate(*params_massive)
-      name = params_massive[0].to_sym
-      v_type = params_massive[1].to_sym
-      specifics = params_massive[2]
+    def validate(name, v_type, specifics = 0)
       self.params_hash = {}
-      self.params_hash['name']=name
-      self.params_hash['types']=v_type
-      self.params_hash['specials']=specifics
+      self.params_hash = {['name']=>name,['types']=>v_type,['specials']=>specifics }
       self.params ||= []
       self.params.append(self.params_hash)
     end
@@ -83,31 +78,43 @@ module Validation
     def validate!
       self.class.params.each do |param|
         if param['types'] == :presence
-          if @own_values[param['name']][0].nil?
-            print 'Переменная, не прошедшая валидацию: '
-            puts param['name']
-            raise  'Значение атрибута не может быть nil!'
-          end 
-          if @own_values[param['name']][0] == ''
-            print 'Переменная, не прошедшая валидацию: '
-            puts param['name']
-            raise 'Значение атрибута не может быть пустым!' 
-          end
+          presence
         end
         if param['types'] == :format
-          if @own_values[param['name']][-1] !~ param['specials']
-            print 'Переменная, не прошедшая валидацию: '
-            puts param['name']
-            raise 'Значение атрибута не соответствует формату'
-          end
+          form
         end
         if param['types'] == :type
-          if @own_values[param['name']][-1].class != param['specials']
-            print 'Переменная, не прошедшая валидацию: '
-            puts param['name']
-            raise 'Тип атрибута не соответствует заданному' 
-          end
+          type
         end
+      end
+    end
+    
+     def presence
+      if @own_values[param['name']][0].nil?
+        print 'Переменная, не прошедшая валидацию: '
+        puts param['name']
+        raise  'Значение атрибута не может быть nil!'
+      end
+      if @own_values[param['name']][0] == ''
+        print 'Переменная, не прошедшая валидацию: '
+        puts param['name']
+        raise 'Значение атрибута не может быть пустым!' 
+      end
+    end
+
+    def form
+      if @own_values[param['name']][-1] !~ param['specials']
+        print 'Переменная, не прошедшая валидацию: '
+        puts param['name']
+        raise 'Значение атрибута не соответствует формату'
+      end
+    end
+
+    def type 
+      if @own_values[param['name']][-1].class != param['specials']
+        print 'Переменная, не прошедшая валидацию: '
+        puts param['name']
+        raise 'Тип атрибута не соответствует заданному' 
       end
     end
 
