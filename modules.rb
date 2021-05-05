@@ -34,10 +34,12 @@ module Accessor
 
   module ClassMethods
     def attr_accessor_with_history(*names)
+      define_method('own_values'.to_sym) { instance_variable_get('@own_values'.to_sym)}
+      define_method("own_values=".to_sym) {instance_variable_set('@own_values'.to_sym, {})}
       names.each do |name|
         var_name = "@#{name}".to_sym
         #Возмоэно потребуется own_values задать динамически, пока что разумная схема не работает, дебагер не помог
-        define_method(name) { instance_variable_get(var_name); @own_values[name] = [] }
+        define_method(name) { instance_variable_get(var_name);@own_values ||= {}; @own_values[name] = [] }
         define_method("#{name}=".to_sym) { |value| instance_variable_set(var_name, value);
         @own_values[name].append(value) }
         define_method("#{name}_history") { @own_values[name] }
@@ -68,7 +70,7 @@ module Validation
     attr_accessor :params_hash, :params
     def validate(name, v_type, specifics = 0)
       self.params_hash = {}
-      self.params_hash = {['name']=>name,['types']=>v_type,['specials']=>specifics }
+      self.params_hash = {'name'=>name,'types'=>v_type,'specials'=>specifics }
       self.params ||= []
       self.params.append(self.params_hash)
     end
@@ -76,48 +78,41 @@ module Validation
 
   module InstanceMethods
     def validate!
+     
       self.class.params.each do |param|
-        if param['types'] == :presence
-          presence
-        end
-        if param['types'] == :format
-          form
-        end
-        if param['types'] == :type
-          type
-        end
+        send param['types'].to_sym, instance_variable_get("@#{param['name']}".to_sym), param['specials'], param['name']
       end
     end
-    
-     def presence
-      if @own_values[param['name']][0].nil?
+
+    def presence(value, specifics, variable_name)
+      if value.nil?
         print 'Переменная, не прошедшая валидацию: '
-        puts param['name']
+        puts variable_name
         raise  'Значение атрибута не может быть nil!'
       end
-      if @own_values[param['name']][0] == ''
+      if value == ''
         print 'Переменная, не прошедшая валидацию: '
-        puts param['name']
+        puts variable_name
         raise 'Значение атрибута не может быть пустым!' 
       end
     end
 
-    def form
-      if @own_values[param['name']][-1] !~ param['specials']
+    def form(value, specifics, variable_name)
+      if value !~ specifics
         print 'Переменная, не прошедшая валидацию: '
-        puts param['name']
+        puts variable_name
         raise 'Значение атрибута не соответствует формату'
       end
     end
 
-    def type 
-      if @own_values[param['name']][-1].class != param['specials']
+    def type(value, specifics, variable_name)
+      if value.class != specifics
         print 'Переменная, не прошедшая валидацию: '
-        puts param['name']
+        puts variable_name
         raise 'Тип атрибута не соответствует заданному' 
       end
     end
-
+      
     def valid?
       validate!
     rescue
@@ -130,18 +125,8 @@ end
 class Test
   include Accessor
   include Validation
-  attr_accessor :own_values
   attr_accessor_with_history :a, :b, :c
   validate :a, :presence
   validate :b, :type, Integer
   strong_attr_accessor :d, Integer
-  def initialize
-    #Возможно, потребуется подключать эту переменую в каждый класс динамически можно как в методе validate, но зачем...
-    @own_values = {}
-  end
 end
-
-
-
-
-
