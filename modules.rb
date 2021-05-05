@@ -80,35 +80,27 @@ module Validation
     def validate!
      
       self.class.params.each do |param|
-        send param['types'].to_sym, instance_variable_get("@#{param['name']}".to_sym), param['specials'], param['name']
+        send param['types'].to_sym, instance_variable_get("@#{param['name']}".to_sym), param['specials']
       end
     end
 
-    def presence(value, specifics, variable_name)
+    def presence(value, specifics)
       if value.nil?
-        print 'Переменная, не прошедшая валидацию: '
-        puts variable_name
         raise  'Значение атрибута не может быть nil!'
       end
       if value == ''
-        print 'Переменная, не прошедшая валидацию: '
-        puts variable_name
         raise 'Значение атрибута не может быть пустым!' 
       end
     end
 
-    def form(value, specifics, variable_name)
+    def format(value, specifics)
       if value !~ specifics
-        print 'Переменная, не прошедшая валидацию: '
-        puts variable_name
         raise 'Значение атрибута не соответствует формату'
       end
     end
 
-    def type(value, specifics, variable_name)
+    def type(value, specifics)
       if value.class != specifics
-        print 'Переменная, не прошедшая валидацию: '
-        puts variable_name
         raise 'Тип атрибута не соответствует заданному' 
       end
     end
@@ -127,6 +119,6 @@ class Test
   include Validation
   attr_accessor_with_history :a, :b, :c
   validate :a, :presence
-  validate :b, :type, Integer
+  validate :b, :format, /^([а-яa-z]|\d){3}-?([а-яa-z]|\d){2}$/i
   strong_attr_accessor :d, Integer
 end
